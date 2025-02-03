@@ -1,0 +1,21 @@
+{
+  "name": "shortlink",
+  "module": "server.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^5.0.0",
+    "@types/qrcode": "^1.5.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.6",
+    "nanoid": "^5.0.9",
+    "qrcode": "^1.5.4",
+    "redis": "^4.7.0"
+  }
+}

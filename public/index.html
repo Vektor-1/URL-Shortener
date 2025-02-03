@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #shortened-url, #qr-code {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+  <form id="url-form">
+    <label for="longUrl">Enter Long URL:</label>
+    <input type="text" id="longUrl" name="longUrl" required placeholder="Enter URL" />
+    <button type="submit">Shorten URL</button>
+  </form>
+
+  <div id="shortened-url"></div>
+  <div id="qr-code"></div>
+
+  <script>
+    // Handle form submission
+    document.getElementById('url-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const longUrl = document.getElementById('longUrl').value;
+      
+      if (!longUrl) {
+        alert("Please enter a URL.");
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/shorten', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ longUrl }),
+      });
+
+      const data = await response.json();
+
+      // Display the shortened URL and QR code
+      const shortenedUrlDiv = document.getElementById('shortened-url');
+      shortenedUrlDiv.innerHTML = `<strong>Shortened URL:</strong> <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`;
+
+      const qrCodeDiv = document.getElementById('qr-code');
+      qrCodeDiv.innerHTML = `<strong>QR Code:</strong><br><img src="${data.qrCode}" alt="QR Code" />`;
+    });
+  </script>
+</body>
+</html>
