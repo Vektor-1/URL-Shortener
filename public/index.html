@@ -4,26 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URL Shortener</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #shortened-url, #qr-code {
-      margin-top: 20px;
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>URL Shortener</h1>
-  <form id="url-form">
-    <label for="longUrl">Enter Long URL:</label>
-    <input type="text" id="longUrl" name="longUrl" required placeholder="Enter URL" />
-    <button type="submit">Shorten URL</button>
-  </form>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">URL Shortener</h1>
+    <form id="url-form" class="space-y-4">
+      <div>
+        <label for="longUrl" class="block text-sm font-medium text-gray-700">Enter Long URL:</label>
+        <input
+          type="text"
+          id="longUrl"
+          name="longUrl"
+          required
+          placeholder="https://example.com"
+          class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Shorten URL
+      </button>
+    </form>
 
-  <div id="shortened-url"></div>
-  <div id="qr-code"></div>
+    <div id="shortened-url" class="mt-6">
+      <!-- Shortened URL will appear here -->
+    </div>
+
+    <div id="qr-code" class="mt-6 text-center">
+      <!-- QR Code will appear here -->
+    </div>
+  </div>
 
   <script>
     // Handle form submission
@@ -31,28 +44,54 @@
       e.preventDefault();
 
       const longUrl = document.getElementById('longUrl').value;
-      
+
       if (!longUrl) {
         alert("Please enter a URL.");
         return;
       }
 
-      const response = await fetch('http://localhost:3000/shorten', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ longUrl }),
-      });
+      try {
+        const response = await fetch('http://localhost:3000/shorten', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ longUrl }),
+        });
 
-      const data = await response.json();
+        if (!response.ok) {
+          throw new Error('Failed to shorten URL.');
+        }
 
-      // Display the shortened URL and QR code
-      const shortenedUrlDiv = document.getElementById('shortened-url');
-      shortenedUrlDiv.innerHTML = `<strong>Shortened URL:</strong> <a href="${data.shortUrl}" target="_blank">${data.shortUrl}</a>`;
+        const data = await response.json();
 
-      const qrCodeDiv = document.getElementById('qr-code');
-      qrCodeDiv.innerHTML = `<strong>QR Code:</strong><br><img src="${data.qrCode}" alt="QR Code" />`;
+        // Display the shortened URL
+        const shortenedUrlDiv = document.getElementById('shortened-url');
+        shortenedUrlDiv.innerHTML = `
+          <p class="text-sm text-gray-600"><strong>Shortened URL:</strong></p>
+          <a
+            href="${data.shortUrl}"
+            target="_blank"
+            class="mt-2 block text-blue-500 hover:underline break-all"
+          >
+            ${data.shortUrl}
+          </a>
+        `;
+
+        // Display the QR code
+        const qrCodeDiv = document.getElementById('qr-code');
+        qrCodeDiv.innerHTML = `
+          <p class="text-sm text-gray-600"><strong>QR Code:</strong></p>
+          <img
+            src="${data.qrCode}"
+            alt="QR Code"
+            class="mt-2 mx-auto w-48 h-48"
+          />
+        `;
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong. Please try again.");
+      }
     });
   </script>
 </body>
